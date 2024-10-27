@@ -1,5 +1,6 @@
 const ms = require("ms");
 const messages = require("../utils/message");
+
 module.exports.run = async (client, message, args) => {
   // If the member doesn't have enough permissions
   if (
@@ -7,13 +8,13 @@ module.exports.run = async (client, message, args) => {
     !message.member.roles.cache.some(r => r.name === "Giveaways")
   ) {
     return message.reply(
-      ":x: You need to have the manage messages permissions to start giveaways."
+      ":x: You need to have the manage messages permission or the 'Giveaways' role to start giveaways."
     );
   }
 
   // Giveaway channel
   let giveawayChannel = message.mentions.channels.first();
-  // If no channel is mentionned
+  // If no channel is mentioned
   if (!giveawayChannel) {
     return message.reply(":x: You have to mention a valid channel!");
   }
@@ -28,7 +29,7 @@ module.exports.run = async (client, message, args) => {
   // Number of winners
   let giveawayNumberWinners = parseInt(args[2]);
   // If the specified number of winners is not a number
-  if (isNaN(giveawayNumberWinners) || parseInt(giveawayNumberWinners) <= 0) {
+  if (isNaN(giveawayNumberWinners) || giveawayNumberWinners <= 0) {
     return message.reply(
       ":x: You have to specify a valid number of winners!"
     );
@@ -40,6 +41,7 @@ module.exports.run = async (client, message, args) => {
   if (!giveawayPrize) {
     return message.reply(":x: You have to specify a valid prize!");
   }
+
   // Start the giveaway
   await client.giveawaysManager.start(giveawayChannel, {
     // The giveaway duration
@@ -47,11 +49,12 @@ module.exports.run = async (client, message, args) => {
     // The giveaway prize
     prize: giveawayPrize,
     // The giveaway winner count
-    winnerCount: parseInt(giveawayNumberWinners),
+    winnerCount: giveawayNumberWinners,
     // Who hosts this giveaway
     hostedBy: client.config.hostedBy ? message.author : null,
     // Messages
     messages
   });
-  message.reply(`Giveaway started in ${giveawayChannel}!`);
+
+  message.reply(`Giveaway started in ${giveawayChannel} with ${giveawayNumberWinners} winners!`);
 }
